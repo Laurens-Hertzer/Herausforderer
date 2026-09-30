@@ -37,6 +37,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7cb0823c-e577-4deb-b4ad-51872eedec30"
+      }
+    },
+    "owner": "mobile-applikationen-masters-team"
   }
 }
