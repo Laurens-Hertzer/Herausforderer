@@ -1,40 +1,49 @@
-Komponenten: Listen Sie wiederverwendbare UI-Bausteine auf (z. B. Header, Karten, Formulare, List Items).
-Navigation: Entscheiden Sie sich für ein primäres Navigationsschema (Stack, Tabs, Drawer, kombinierte Patterns) und skizzieren Sie die Navigationshierarchie.
+# Architektur-Dokumentation
 
-Start Index
-    :
- -->
- challanges
+## Komponenten
 
- Wiederverwendbare Komponente:
+* `TimerProgressBar` – Countdown-Anzeige
+* `ChallengeCard` – Darstellung der Challenge
+* `MapViewTracker` – GPS und Distanzmessung
+* `LeaderboardList` – Highscore-Liste
+* `PrimaryButton` – Hauptaktionen
+* `InputField` – Namenseingabe
 
- Karte mit Positionsmesser
+## Navigation
 
- Zeitablauf-Bar
+**Native Stack Navigator**
 
+```text
+RootStack
+├── Index
+├── GameScreen
+└── ResultScreen
+```
 
-Datenmodell: Beschreiben Sie die zentralen Datenobjekte inklusive wichtiger Felder, die benötigt werden (z. B. { id, title, status, dueDate }).
+Challenges wechseln automatisch nach Abschluss oder Ablauf der Zeit.
 
-user:
-Name
+## Datenmodell
 
-challange:
-id
-name
-zeit
-aufgabe
-Karte?
-Geschwindigkeit?
-Schütteln?
-Licht?
-Kamera?
-Mikrofon?
-Kompass?
+```typescript
+Challenge {
+  id,
+  title,
+  task,
+  timeLimitSeconds,
+  sensorType,
+  targetValue
+}
 
-leaderboard:
-name
-points
+LeaderboardEntry {
+  id,
+  name,
+  points
+}
+```
 
+## Zustand & Side-Effects
 
-
-Zustand & Side-Effekte: Notieren Sie, welche States lokal bleiben (Screen), welche global geteilt werden sollen (Context/Store) und welche API/Local-Storage-Interaktionen nötig sind.
+* **Lokal:** Spielername, aktuelle Challenge, Timer, Sensor-Fortschritt, Punktestand
+* **Global:** Kein globaler Store; Übergabe über Route-Parameter
+* **Local Storage:** Highscore mit AsyncStorage
+* **Sensoren:** Expo-Sensoren werden pro Challenge aktiviert und danach wieder entfernt.
