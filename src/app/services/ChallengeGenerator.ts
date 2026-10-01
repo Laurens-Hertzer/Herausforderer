@@ -48,12 +48,22 @@ export class ChallengeGenerator {
           targetValue: 5 + level * 2,
         };
       case 'colorButton': {
-        const color = colors[Math.floor(Math.random() * colors.length)];
+        const targetColor = colors[Math.floor(Math.random() * colors.length)];
+        const labels = [...colors].sort(() => Math.random() - 0.5);
+        const buttonColors = [...colors].sort(() => Math.random() - 0.5);
+        const askForLabel = Math.random() < 0.5;
+        const targetLabel = labels[buttonColors.indexOf(targetColor)];
+
         return {
           id: Date.now(), title: 'Correct color!',
-          task: `Drücke den ${colorText[color]} Button.`,
+          task: askForLabel
+            ? `Drücke den Button ${targetLabel}.`
+            : `Drücke den ${colorText[targetColor]} Button.`,
           timeLimitSeconds: 10, sensorType: 'colorButton',
-          targetValue: 1, targetColor: color,
+          targetValue: 1, targetColor, askForLabel,
+          colorButtons: buttonColors.map((color, index) => ({
+            color, label: labels[index],
+          })),
         };
       }
     }

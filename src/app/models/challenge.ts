@@ -14,4 +14,6 @@ export interface Challenge {
   sensorType: SensorType;
   targetValue: number;
   targetColor?: string;
+  colorButtons?: { label: string; color: string }[];
+  askForLabel?: boolean;
 }
