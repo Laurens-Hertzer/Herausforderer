@@ -10,16 +10,21 @@ export default function PrimaryButton({ onPress, title }: { onPress: () => void;
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#005380',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginBottom: 160,
+    backgroundColor: '#FF3D9A',
+    paddingVertical: 16,
+    paddingHorizontal: 36,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#FFD23F',
+    shadowColor: '#FF3D9A',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 19,
+    fontWeight: '900',
     textAlign: 'center',
   },
 });

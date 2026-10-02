@@ -4,11 +4,33 @@ import { Accelerometer, DeviceMotion, Pedometer } from 'expo-sensors';
 import {
   requestRecordingPermissionsAsync, useAudioStream,
 } from 'expo-audio';
+import GameOverScreen from './GameOverScreen';
 import { ChallengeContext } from './context/herausfordererContext';
+import { useRouter } from 'expo-router';
+
 const COLORS: Record<string, string> = {
-  Rot: '#e53935', Blau: '#1e88e5', Grün: '#43a047', Gelb: '#fdd835',
+  background: '#090B35',
+  card: '#171B55',
+  cyan: '#00E5FF',
+  blue: '#367CFF',
+  purple: '#9B5CFF',
+  pink: '#FF3D9A',
+  orange: '#FF6B35',
+  yellow: '#FFD23F',
+  green: '#35E58C',
+  white: '#FFFFFF',
+  text: '#F4F7FF',
+  muted: '#B9C7F5',
+
+  Rot: '#FF4D5A',
+  Blau: '#367CFF',
+  Grün: '#35D98A',
+  Gelb: '#FFD23F',
 };
 export default function GameScreen() {
+
+  const router = useRouter();
+
   const ctx = useContext(ChallengeContext);
   if (!ctx) return <Text>ChallengeProvider fehlt.</Text>;
   const { challenge, level, generateChallenge, completeChallenge } = ctx;
@@ -133,12 +155,10 @@ export default function GameScreen() {
       await audioStream.stream.start();
     })().catch(() => setStatus('Mikrofon-Fehler'));
     return () => {
-      try { audioStream.stream.stop(); } catch {}
+      try { audioStream.stream.stop(); } catch { }
     };
   }, [challenge?.id, time > 0, locked]);
-  useEffect(() => {
-    if (time === 0 && challenge && !locked) setStatus('Zeit abgelaufen');
-  }, [time, challenge?.id, locked]);
+
   const finish = () => {
     if (locked) return;
     setLocked(true);
@@ -150,31 +170,36 @@ export default function GameScreen() {
     setValue(v => v + 1);
     if (value + 1 >= challenge.targetValue) finish();
   };
-  const colorTap = (buttonColor: string, buttonLabel: string) => {
-    if (locked || !challenge) return;
-    const target = challenge.targetColor;
-    const asksForLabel = challenge.task.includes('Button ');
-    const correct = asksForLabel
-      ? buttonLabel === challenge.colorButtons?.find(b => b.color === target)?.label
-      : buttonColor === target;
-    if (correct) finish();
-    else setStatus('Falsch! Versuch es erneut.');
-  };
-  if (!challenge) return <View style={styles.center}><Text>Lade Challenge...</Text></View>;
+const colorTap = (buttonColor: string, buttonLabel: string) => {
+  if (locked || !challenge) return;
+
+  const target = challenge.targetColor;
+  const correct = challenge.askForLabel
+    ? buttonLabel === challenge.colorButtons?.find(b => b.color === target)?.label
+    : buttonColor === target;
+
+  if (correct) {
+    finish();
+  } else {
+    setStatus('Game Over!');
+    setLocked(true);
+  }
+};
+  if (!challenge) return <Text>Challenge wird geladen...</Text>;
   const display = value.toFixed(0);
   const unit = challenge.sensorType === 'microphone' ? 'Treffer'
     : challenge.sensorType === 'tilt' ? '°'
-    : challenge.sensorType === 'steps' ? 'Schritte' : '';
+      : challenge.sensorType === 'steps' ? 'Schritte' : '';
   return (
     <View style={styles.container}>
-      <Text>Level {level}</Text>
+      <Text style={styles.level}>Level {level}</Text>
       <Text style={styles.title}>{challenge.title}</Text>
       <Text style={styles.task}>{challenge.task}</Text>
       <Text style={styles.timer}>{time}s</Text>
       <View style={styles.valueBox}>
-        <Text>Aktueller Wert</Text>
+        <Text style={styles.value}>Aktueller Wert</Text>
         <Text style={styles.value}>{display} {unit}</Text>
-        <Text>{status}</Text>
+        <Text style={styles.level}>{status}</Text>
       </View>
       {challenge.sensorType === 'button' && (
         <Pressable style={({ pressed }) => [styles.button, pressed && styles.pressed]} onPress={tap}>
@@ -204,17 +229,96 @@ export default function GameScreen() {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', padding: 24, gap: 16 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 30, fontWeight: 'bold' },
-  task: { fontSize: 18, textAlign: 'center' },
-  timer: { fontSize: 28 },
-  valueBox: { alignItems: 'center', padding: 18, borderWidth: 1, borderRadius: 12, minWidth: 220 },
-  value: { fontSize: 34, fontWeight: 'bold' },
-  button: { paddingHorizontal: 45, paddingVertical: 20, borderRadius: 12, backgroundColor: '#005380' },
-  pressed: { opacity: 0.65 },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  darkText: { color: '#111', fontSize: 18, fontWeight: 'bold' },
-  colors: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12 },
-  colorButton: { width: 130, height: 70, alignItems: 'center', justifyContent: 'center', borderRadius: 12 },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 20,
+    gap: 14,
+    backgroundColor: COLORS.background,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.background,
+  },
+  level: {
+    color: COLORS.yellow,
+    fontSize: 17,
+    fontWeight: '900',
+  },
+  title: {
+    color: COLORS.white,
+    fontSize: 30,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  task: {
+    color: COLORS.muted,
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  timer: {
+    color: COLORS.orange,
+    fontSize: 36,
+    fontWeight: '900',
+  },
+  valueBox: {
+    alignItems: 'center',
+    padding: 20,
+    minWidth: 250,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: COLORS.cyan,
+    backgroundColor: COLORS.card,
+    shadowColor: COLORS.cyan,
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  value: {
+    color: COLORS.white,
+    fontSize: 38,
+    fontWeight: '900',
+  },
+  button: {
+    paddingHorizontal: 50,
+    paddingVertical: 20,
+    borderRadius: 20,
+    backgroundColor: COLORS.pink,
+    borderWidth: 2,
+    borderColor: COLORS.yellow,
+    elevation: 8,
+  },
+  pressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.96 }],
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: '900',
+  },
+  darkText: {
+    color: '#15152F',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  colors: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  colorButton: {
+    width: 140,
+    height: 72,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: COLORS.white,
+    elevation: 6,
+  },
 });

@@ -15,9 +15,9 @@ type TimerProgressBarProps = {
 export default function TimerProgressBar({
 	duration,
 	remainingTime,
-	color = '#4CAF50',
-	trackColor = '#E0E0E0',
-	height = 8,
+	color = '#FFB52E',
+	trackColor = '#171C4A',
+	height = 12,
 	style,
 }: TimerProgressBarProps) {
 	const progress = duration > 0
@@ -41,13 +41,16 @@ export default function TimerProgressBar({
 }
 
 const styles = StyleSheet.create({
-	track: {
-		width: '100%',
-		borderRadius: 999,
-		overflow: 'hidden',
-	},
-	fill: {
-		height: '100%',
-		borderRadius: 999,
-	},
+  track: {
+    width: '100%',
+    borderRadius: 999,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#263B8F',
+    backgroundColor: '#171C4A',
+  },
+  fill: {
+    height: '100%',
+    borderRadius: 999,
+  },
 });
